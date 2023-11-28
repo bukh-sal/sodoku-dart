@@ -3,6 +3,7 @@ import "dart:io";
 class Grid {
   late List<List<int>> grid;
   late List<List<Map<int, int>>> locationsMap;
+  late Map<int, int> blockSegmentMap;
 
   Grid() {
     grid = [
@@ -18,6 +19,12 @@ class Grid {
     ];
 
     locationsMap = generateLocationsMap();
+
+    blockSegmentMap = {
+      0: 0, 1: 0, 2: 0,
+      3: 1, 4: 1, 5: 1,
+      6: 2, 7: 2, 8: 2
+    };
   }
 
   @override
@@ -151,11 +158,7 @@ class Grid {
     }
 
     List<int> soloutionSpace = [1, 2, 3, 4, 5, 6, 7, 8, 9];
-    Map<int, int> blockSegmentMap = {
-      0: 0, 1: 0, 2: 0,
-      3: 1, 4: 1, 5: 1,
-      6: 2, 7: 2, 8: 2
-    };
+
 
     // Getting values in segment, row, and column
     int segX = blockSegmentMap[locX]!;
@@ -192,6 +195,48 @@ class Grid {
     }
   }
 
+
+  void elemenationPass(){
+    for (int y = 0; y < 9; y++) {
+      for (int x = 0; x < 9; x++) {
+        List<int> blockSoloutionSpace = getBlockSoloutionSpace(x, y);
+        int blockValue = grid[y][x];
+        if (blockValue == 0 || blockSoloutionSpace.length > 1){
+          List<Map<int, int>> segmentLocations = getSegmentLocations(blockSegmentMap[x]!, blockSegmentMap[y]!);
+          segmentLocations.remove({y:x});
+
+          // check if soloution exsits in any other block, if it does remove it from space
+          for (int i = 0; i < blockSoloutionSpace.length; i++){
+            // checking every possible soloution
+            int soloution = blockSoloutionSpace[i];
+            
+            for (int blockId = 0; blockId < segmentLocations.length; blockId++){
+              Map<int, int> inSegmentBlock = segmentLocations[blockId];
+              int locY = inSegmentBlock.keys.toList().first;
+              int locX = inSegmentBlock[locY]!;
+              List<int> inSegmentBlockSoloutions = getBlockSoloutionSpace(locX, locY);
+              if (inSegmentBlockSoloutions.contains(soloution)) {
+                blockSoloutionSpace.remove(soloution);
+                i++;
+              }
+           
+           
+            }
+
+            if (blockSoloutionSpace.length == 1){
+              grid[y][x] = blockSoloutionSpace[0];
+              print('location y=$y and x=$x set to ${blockSoloutionSpace[0]} sol space $blockSoloutionSpace');
+              break;
+            }
+
+          }
+
+        }
+      }
+    }
+  }
+
+
   void runPass() {
     singleOptionPass();
   }
@@ -219,11 +264,20 @@ void main(List<String> arguments) {
 
   grid.displayGrid();
   print("Zero count = ${grid.countEmpty()}");
-  grid.runPass();
+
+
+  grid.singleOptionPass();
   print('\n\n');
   grid.displayGrid();
   print("Zero count = ${grid.countEmpty()}");
 
-  var v = grid.getSegmentLocations(0, 0);
-  print(v);
+
+  print("ELEMENATION PASS");
+  grid.elemenationPass();
+  print('\n\n');
+  grid.displayGrid();
+  print("Zero count = ${grid.countEmpty()}");
+
+
+
 }
