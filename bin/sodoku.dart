@@ -20,11 +20,7 @@ class Grid {
 
     locationsMap = generateLocationsMap();
 
-    blockSegmentMap = {
-      0: 0, 1: 0, 2: 0,
-      3: 1, 4: 1, 5: 1,
-      6: 2, 7: 2, 8: 2
-    };
+    blockSegmentMap = {0: 0, 1: 0, 2: 0, 3: 1, 4: 1, 5: 1, 6: 2, 7: 2, 8: 2};
   }
 
   @override
@@ -48,13 +44,11 @@ class Grid {
     return segmentLocationsMap;
   }
 
-
   void printGrid() {
     for (int i = 0; i < grid.length; i++) {
       print(grid[i]);
     }
   }
-
 
   void displayGrid() {
     for (int rowIdx = 0; rowIdx < grid.length; rowIdx++) {
@@ -73,10 +67,8 @@ class Grid {
       } else {
         stdout.write('\n');
       }
-
     }
   }
-
 
   List<int> getValuesInRow(int rowNumber) {
     List<int> uVals = [];
@@ -90,7 +82,6 @@ class Grid {
     return uVals;
   }
 
-
   List<int> getValuesInCol(int colNumber) {
     List<int> uVals = [];
     for (int i = 0; i < grid.length; i++) {
@@ -102,7 +93,6 @@ class Grid {
     }
     return uVals;
   }
-
 
   List<int> getValuesInSegment(int locX, int locY) {
     Map<int, int> startFromMap = {0: 0, 1: 3, 2: 6};
@@ -130,7 +120,6 @@ class Grid {
     return uVals;
   }
 
-
   List<Map<int, int>> getSegmentLocations(int locX, int locY) {
     // reduce the locations to the desired segments
     Map<int, int> startFromMap = {0: 0, 1: 3, 2: 6};
@@ -138,7 +127,8 @@ class Grid {
 
     int rowsStartFrom = startFromMap[locY]!;
     int colsStartFrom = startFromMap[locX]!;
-    List<List<Map<int, int>>> rows = locationsMap.sublist(rowsStartFrom, rowsStartFrom + 3);
+    List<List<Map<int, int>>> rows =
+        locationsMap.sublist(rowsStartFrom, rowsStartFrom + 3);
 
     for (int i = 0; i < rows.length; i++) {
       List<Map<int, int>> rowValues =
@@ -149,7 +139,6 @@ class Grid {
     return combined;
   }
 
-
   List<int> getBlockSoloutionSpace(int locX, int locY) {
     int currentValue = grid[locY][locX];
     if (currentValue != 0) {
@@ -158,7 +147,6 @@ class Grid {
     }
 
     List<int> soloutionSpace = [1, 2, 3, 4, 5, 6, 7, 8, 9];
-
 
     // Getting values in segment, row, and column
     int segX = blockSegmentMap[locX]!;
@@ -195,47 +183,42 @@ class Grid {
     }
   }
 
-
-  void elemenationPass(){
+  void elemenationPass() {
     for (int y = 0; y < 9; y++) {
       for (int x = 0; x < 9; x++) {
         List<int> blockSoloutionSpace = getBlockSoloutionSpace(x, y);
-        int blockValue = grid[y][x];
-        if (blockValue == 0 || blockSoloutionSpace.length > 1){
-          List<Map<int, int>> segmentLocations = getSegmentLocations(blockSegmentMap[x]!, blockSegmentMap[y]!);
-          segmentLocations.remove({y:x});
+        if (blockSoloutionSpace.length > 1) {
+          List<Map<int, int>> neighbourBlocksLocations =
+              getSegmentLocations(blockSegmentMap[y]!, blockSegmentMap[x]!);
+          neighbourBlocksLocations.remove({y: x});
 
           // check if soloution exsits in any other block, if it does remove it from space
-          for (int i = 0; i < blockSoloutionSpace.length; i++){
-            // checking every possible soloution
-            int soloution = blockSoloutionSpace[i];
-            
-            for (int blockId = 0; blockId < segmentLocations.length; blockId++){
-              Map<int, int> inSegmentBlock = segmentLocations[blockId];
-              int locY = inSegmentBlock.keys.toList().first;
-              int locX = inSegmentBlock[locY]!;
-              List<int> inSegmentBlockSoloutions = getBlockSoloutionSpace(locX, locY);
-              if (inSegmentBlockSoloutions.contains(soloution)) {
-                blockSoloutionSpace.remove(soloution);
-                i++;
+          for (int i = 0; i < blockSoloutionSpace.length; i++) {
+            if (grid[y][x] == 0) {
+              // checking every possible soloution
+              int soloution = blockSoloutionSpace[i];
+
+              for (int neighbourBlock = 0;
+                  neighbourBlock < neighbourBlocksLocations.length;
+                  neighbourBlock++) {
+                int locY = neighbourBlocksLocations[i].keys.first;
+                int locX = neighbourBlocksLocations[i][locY]!;
+                List<int> nBlockSoloutions = getBlockSoloutionSpace(locX, locY);
+                if (nBlockSoloutions.contains(soloution)) {
+                  blockSoloutionSpace.remove(soloution);
+                }
               }
-           
-           
             }
-
-            if (blockSoloutionSpace.length == 1){
-              grid[y][x] = blockSoloutionSpace[0];
-              print('location y=$y and x=$x set to ${blockSoloutionSpace[0]} sol space $blockSoloutionSpace');
-              break;
-            }
-
           }
 
+          if (blockSoloutionSpace.length == 1) {
+            grid[y][x] = blockSoloutionSpace[0];
+            print('set y=$y x=$x to ${blockSoloutionSpace[0]}');
+          }
         }
       }
     }
   }
-
 
   void runPass() {
     singleOptionPass();
@@ -265,19 +248,48 @@ void main(List<String> arguments) {
   grid.displayGrid();
   print("Zero count = ${grid.countEmpty()}");
 
-
+  grid.singleOptionPass();
+  grid.singleOptionPass();
   grid.singleOptionPass();
   print('\n\n');
   grid.displayGrid();
   print("Zero count = ${grid.countEmpty()}");
 
-
   print("ELEMENATION PASS");
+  grid.elemenationPass();
+  grid.elemenationPass();
   grid.elemenationPass();
   print('\n\n');
   grid.displayGrid();
   print("Zero count = ${grid.countEmpty()}");
 
+  grid.singleOptionPass();
+  grid.singleOptionPass();
+  grid.singleOptionPass();
+  print('\n\n');
+  grid.displayGrid();
+  print("Zero count = ${grid.countEmpty()}");
 
+  print("ELEMENATION PASS");
+  grid.elemenationPass();
+  grid.elemenationPass();
+  grid.elemenationPass();
+  print('\n\n');
+  grid.displayGrid();
+  print("Zero count = ${grid.countEmpty()}");
 
+  grid.singleOptionPass();
+  grid.singleOptionPass();
+  grid.singleOptionPass();
+  print('\n\n');
+  grid.displayGrid();
+  print("Zero count = ${grid.countEmpty()}");
+
+  print("ELEMENATION PASS");
+  grid.elemenationPass();
+  grid.elemenationPass();
+  grid.elemenationPass();
+  print('\n\n');
+  grid.displayGrid();
+  print("Zero count = ${grid.countEmpty()}");
 }
