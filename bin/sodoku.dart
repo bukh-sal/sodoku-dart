@@ -1,7 +1,7 @@
 import "dart:io";
 
 class Grid {
-  late List<List<dynamic>> grid;
+  late List<List<String>> grid;
   late List<List<Map<dynamic, dynamic>>> locationsMap;
   late Map<dynamic, dynamic> blockSegmentMap;
 
@@ -83,7 +83,7 @@ class Grid {
 
   void displayGrid() {
     for (int rowIdx = 0; rowIdx < grid.length; rowIdx++) {
-      List<dynamic> row = grid[rowIdx];
+      List<String> row = grid[rowIdx];
       for (int colIdx = 0; colIdx < row.length; colIdx++) {
         String value = row[colIdx];
         stdout.write('$value ');
@@ -101,9 +101,9 @@ class Grid {
     }
   }
 
-  List<dynamic> getValuesInRow(int rowNumber) {
-    List<dynamic> uVals = [];
-    List<dynamic> row = grid[rowNumber];
+  List<String> getValuesInRow(int rowNumber) {
+    List<String> uVals = [];
+    List<String> row = grid[rowNumber];
     for (int i = 0; i < row.length; i++) {
       String value = row[i];
       if (!uVals.contains(value)) {
@@ -113,11 +113,11 @@ class Grid {
     return uVals;
   }
 
-  List<dynamic> getValuesInCol(int colNumber) {
-    List<dynamic> uVals = [];
+  List<String> getValuesInCol(int colNumber) {
+    List<String> uVals = [];
     for (int i = 0; i < grid.length; i++) {
-      List<dynamic> row = grid[i];
-      int value = row[colNumber];
+      List<String> row = grid[i];
+      String value = row[colNumber];
       if (!uVals.contains(value)) {
         uVals.add(value);
       }
@@ -125,7 +125,7 @@ class Grid {
     return uVals;
   }
 
-  List<dynamic> getValuesInSegment(int locX, int locY) {
+  List<String> getValuesInSegment(int locX, int locY) {
     Map<dynamic, dynamic> startFromMap = {
       0: 0,
       1: 4,
@@ -134,19 +134,19 @@ class Grid {
       };
     int rowsStartFrom = startFromMap[locY]!;
     int colsStartFrom = startFromMap[locX]!;
-    List<List<dynamic>> rows = grid.sublist(rowsStartFrom, rowsStartFrom + 4);
+    List<List<String>> rows = grid.sublist(rowsStartFrom, rowsStartFrom + 4);
 
     for (int i = 0; i < rows.length; i++) {
-      List<dynamic> rowValues = rows[i].sublist(colsStartFrom, colsStartFrom + 4);
+      List<String> rowValues = rows[i].sublist(colsStartFrom, colsStartFrom + 4);
       rows[i] = rowValues;
     }
 
-    List<dynamic> uVals = [];
+    List<String> uVals = [];
     for (int a = 0; a < rows.length; a++) {
-      List<dynamic> row = rows[a];
+      List<String> row = rows[a];
 
       for (int b = 0; b < row.length; b++) {
-        int value = row[b];
+        String value = row[b];
         if (!uVals.contains(value)) {
           uVals.add(value);
         }
@@ -180,43 +180,43 @@ class Grid {
     return combined;
   }
 
-  List<dynamic> getBlockSoloutionSpace(int locX, int locY) {
-    int currentValue = grid[locY][locX];
+  List<String> getBlockSolutionSpace(int locX, int locY) {
+    String currentValue = grid[locY][locX];
     if (currentValue != '0') {
-      List<dynamic> cv = [currentValue];
+      List<String> cv = [currentValue];
       return cv;
     }
 
-    List<dynamic> soloutionSpace = ['1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F', 'G'];
+    List<String> solutionSpace = ['1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F', 'G'];
 
     // Getting values in segment, row, and column
     int segX = blockSegmentMap[locX]!;
     int segY = blockSegmentMap[locY]!;
-    List<dynamic> segmentValues = getValuesInSegment(segX, segY);
-    List<dynamic> rowValues = getValuesInRow(locY);
-    List<dynamic> colValues = getValuesInCol(locX);
+    List<String> segmentValues = getValuesInSegment(segX, segY);
+    List<String> rowValues = getValuesInRow(locY);
+    List<String> colValues = getValuesInCol(locX);
 
     // combine segment, row, and column into one list
-    List<dynamic> conflictingValues = [];
+    List<String> conflictingValues = [];
     conflictingValues.addAll(segmentValues);
     conflictingValues.addAll(rowValues);
     conflictingValues.addAll(colValues);
 
-    // remove conflicting values from soloution space
+    // remove conflicting values from solution space
     for (int i = 0; i < conflictingValues.length; i++) {
-      int value = conflictingValues[i];
-      if (soloutionSpace.contains(value)) {
-        soloutionSpace.remove(value);
+      String value = conflictingValues[i].toString();
+      if (solutionSpace.contains(value)) {
+        solutionSpace.remove(value);
       }
     }
 
-    return soloutionSpace;
+    return solutionSpace;
   }
 
   void singleOptionPass() {
     for (int y = 0; y < 16; y++) {
       for (int x = 0; x < 16; x++) {
-        List<dynamic> solSpace = getBlockSoloutionSpace(x, y);
+        List<String> solSpace = getBlockSolutionSpace(x, y);
         if (solSpace.length == 1) {
           grid[y][x] = solSpace[0];
         }
@@ -224,37 +224,37 @@ class Grid {
     }
   }
 
-  void elemenationPass() {
+  void eliminationPass() {
     for (int y = 0; y < 16; y++) {
       for (int x = 0; x < 16; x++) {
-        List<dynamic> blockSoloutionSpace = getBlockSoloutionSpace(x, y);
-        if (blockSoloutionSpace.length > 1) {
-          List<Map<dynamic, dynamic>> neighbourBlocksLocations =
+        List<String> blockSolutionSpace = getBlockSolutionSpace(x, y);
+        if (blockSolutionSpace.length > 1) {
+          List<Map<dynamic, dynamic>> neighborBlocksLocations =
               getSegmentLocations(blockSegmentMap[y]!, blockSegmentMap[x]!);
-          neighbourBlocksLocations.remove({y: x});
+          neighborBlocksLocations.remove({y: x});
 
-          // check if soloution exsits in any other block, if it does remove it from space
-          for (int i = 0; i < blockSoloutionSpace.length; i++) {
-            if (grid[y][x] == 0) {
-              // checking every possible soloution
-              var soloution = blockSoloutionSpace[i];
+          // check if solution exists in any other block, if it does remove it from space
+          for (int i = 0; i < blockSolutionSpace.length; i++) {
+            if (grid[y][x] == '0') {
+              // checking every possible solution
+              var solution = blockSolutionSpace[i];
 
-              for (int neighbourBlock = 0;
-                  neighbourBlock < neighbourBlocksLocations.length;
-                  neighbourBlock++) {
-                int locY = neighbourBlocksLocations[i].keys.first;
-                int locX = neighbourBlocksLocations[i][locY]!;
-                List<dynamic> nBlockSoloutions = getBlockSoloutionSpace(locX, locY);
-                if (nBlockSoloutions.contains(soloution)) {
-                  blockSoloutionSpace.remove(soloution);
+              for (int neighborBlock = 0;
+                  neighborBlock < neighborBlocksLocations.length;
+                  neighborBlock++) {
+                int locY = neighborBlocksLocations[i].keys.first;
+                int locX = neighborBlocksLocations[i][locY]!;
+                List<String> nBlockSolutions = getBlockSolutionSpace(locX, locY);
+                if (nBlockSolutions.contains(solution)) {
+                  blockSolutionSpace.remove(solution);
                 }
               }
             }
           }
 
-          if (blockSoloutionSpace.length == 1) {
-            grid[y][x] = blockSoloutionSpace[0];
-            print('set y=$y x=$x to ${blockSoloutionSpace[0]}');
+          if (blockSolutionSpace.length == 1) {
+            grid[y][x] = blockSolutionSpace[0];
+            print('set y=$y x=$x to ${blockSolutionSpace[0]}');
           }
         }
       }
@@ -284,7 +284,7 @@ class Grid {
 
 void main(List<String> arguments) {
   Grid grid = Grid();
-  print('space for row 4 col 1 ${grid.getBlockSoloutionSpace(0, 3)}');
+  print('space for row 4 col 1 ${grid.getBlockSolutionSpace(0, 3)}');
 
   grid.displayGrid();
   print("Zero count = ${grid.countEmpty()}");
@@ -296,10 +296,10 @@ void main(List<String> arguments) {
   grid.displayGrid();
   print("Zero count = ${grid.countEmpty()}");
 
-  print("ELEMENATION PASS");
-  grid.elemenationPass();
-  grid.elemenationPass();
-  grid.elemenationPass();
+  print("ELIMINATION PASS");
+  grid.eliminationPass();
+  grid.eliminationPass();
+  grid.eliminationPass();
   print('\n\n');
   grid.displayGrid();
   print("Zero count = ${grid.countEmpty()}");
@@ -311,10 +311,10 @@ void main(List<String> arguments) {
   grid.displayGrid();
   print("Zero count = ${grid.countEmpty()}");
 
-  print("ELEMENATION PASS");
-  grid.elemenationPass();
-  grid.elemenationPass();
-  grid.elemenationPass();
+  print("ELIMINATION PASS");
+  grid.eliminationPass();
+  grid.eliminationPass();
+  grid.eliminationPass();
   print('\n\n');
   grid.displayGrid();
   print("Zero count = ${grid.countEmpty()}");
@@ -326,10 +326,76 @@ void main(List<String> arguments) {
   grid.displayGrid();
   print("Zero count = ${grid.countEmpty()}");
 
-  print("ELEMENATION PASS");
-  grid.elemenationPass();
-  grid.elemenationPass();
-  grid.elemenationPass();
+  print("ELIMINATION PASS");
+  grid.eliminationPass();
+  grid.eliminationPass();
+  grid.eliminationPass();
+  print('\n\n');
+  grid.displayGrid();
+  print("Zero count = ${grid.countEmpty()}");
+
+
+  grid.singleOptionPass();
+  grid.singleOptionPass();
+  grid.singleOptionPass();
+  print('\n\n');
+  grid.displayGrid();
+  print("Zero count = ${grid.countEmpty()}");
+
+  print("ELIMINATION PASS");
+  grid.eliminationPass();
+  grid.eliminationPass();
+  grid.eliminationPass();
+  print('\n\n');
+  grid.displayGrid();
+  print("Zero count = ${grid.countEmpty()}");
+
+
+
+  grid.singleOptionPass();
+  grid.singleOptionPass();
+  grid.singleOptionPass();
+  print('\n\n');
+  grid.displayGrid();
+  print("Zero count = ${grid.countEmpty()}");
+
+  print("ELIMINATION PASS");
+  grid.eliminationPass();
+  grid.eliminationPass();
+  grid.eliminationPass();
+  print('\n\n');
+  grid.displayGrid();
+  print("Zero count = ${grid.countEmpty()}");
+
+
+
+  grid.singleOptionPass();
+  grid.singleOptionPass();
+  grid.singleOptionPass();
+  print('\n\n');
+  grid.displayGrid();
+  print("Zero count = ${grid.countEmpty()}");
+
+  print("ELIMINATION PASS");
+  grid.eliminationPass();
+  grid.eliminationPass();
+  grid.eliminationPass();
+  print('\n\n');
+  grid.displayGrid();
+  print("Zero count = ${grid.countEmpty()}");
+
+
+  grid.singleOptionPass();
+  grid.singleOptionPass();
+  grid.singleOptionPass();
+  print('\n\n');
+  grid.displayGrid();
+  print("Zero count = ${grid.countEmpty()}");
+
+  print("ELIMINATION PASS");
+  grid.eliminationPass();
+  grid.eliminationPass();
+  grid.eliminationPass();
   print('\n\n');
   grid.displayGrid();
   print("Zero count = ${grid.countEmpty()}");
