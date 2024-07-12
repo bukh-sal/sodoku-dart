@@ -1,26 +1,57 @@
 import "dart:io";
 
 class Grid {
-  late List<List<int>> grid;
-  late List<List<Map<int, int>>> locationsMap;
-  late Map<int, int> blockSegmentMap;
+  late List<List<dynamic>> grid;
+  late List<List<Map<dynamic, dynamic>>> locationsMap;
+  late Map<dynamic, dynamic> blockSegmentMap;
 
   Grid() {
     grid = [
-      [3, 0, 0, 0, 9, 0, 8, 2, 0],
-      [0, 1, 0, 6, 0, 0, 0, 0, 0],
-      [0, 0, 0, 4, 3, 0, 0, 7, 6],
-      [0, 9, 1, 0, 0, 0, 6, 4, 0],
-      [0, 0, 0, 0, 2, 0, 0, 0, 8],
-      [6, 0, 8, 9, 0, 0, 0, 0, 0],
-      [7, 0, 6, 3, 0, 9, 2, 5, 4],
-      [1, 2, 3, 5, 0, 8, 0, 6, 9],
-      [0, 4, 0, 2, 0, 7, 0, 0, 0],
+      ['0', '0', '0', '0',   '0', '1', '0', '6',    '0', '8', '0', '0',   'D', 'C', '0', '4'],
+      ['0', '0', '6', 'C',   '7', '8', '2', '5',    '1', '0', '0', '3',   'B', 'E', 'A', '0'],
+      ['0', '0', '4', 'E',   'C', '0', '0', '0',    'G', '5', 'A', '0',   '8', '0', '2', '0'],
+      ['A', '8', '0', '0',   '0', 'E', '4', '0',    '0', '2', '6', '0',   '0', 'G', '0', '9'],
+
+      ['4', 'E', 'B', '0',   '9', '0', '3', '0',    'A', '0', 'D', '0',   '7', '2', '6', '8'],
+      ['0', '0', 'A', '0',   'G', 'F', '1', 'E',    '0', '0', '0', '2',   '5', '0', '0', 'D'],
+      ['1', '0', 'C', '0',   '0', '0', 'D', '4',    '0', 'B', '0', '9',   '0', '0', '0', 'G'],
+      ['6', '0', '0', 'G',   '2', 'A', '0', 'B',    '0', '0', '0', '0',   '0', '0', 'F', '0'],
+
+      ['7', '0', '1', '0',   '4', '0', '0', 'G',    'B', 'D', '0', '5',   '0', '6', '0', '3'],
+      ['G', 'B', '0', '0',   '0', '2', '6', '8',    '7', 'F', '0', '0',   'C', 'A', '0', '0'],
+      ['E', '0', '0', '0',   '0', 'B', '0', '0',    '3', '0', '9', '0',   '0', 'D', 'G', '5'],
+      ['8', 'C', '0', 'D',   '0', '0', 'E', '9',    '2', '0', '0', '6',   '4', '0', '0', '0'],
+
+      ['0', 'F', '0', '0',   '0', '7', '9', '3',    '0', '0', '0', 'A',   'G', '8', '4', '2'],
+      ['B', '0', '8', 'A',   '6', '0', '0', '0',    '0', '0', '3', '1',   '0', '0', 'D', 'C'],
+      ['0', '0', '0', '0',   'E', 'D', '0', '0',    '0', '4', '8', 'B',   '6', '5', '0', '7'],
+      ['0', '7', 'E', '6',   '0', '0', '0', '1',    'C', '0', '0', 'D',   '0', '0', 'B', 'A'],
+
     ];
 
     locationsMap = generateLocationsMap();
 
-    blockSegmentMap = {0: 0, 1: 0, 2: 0, 3: 1, 4: 1, 5: 1, 6: 2, 7: 2, 8: 2};
+    blockSegmentMap = {
+      0: 0,
+      1: 0,
+      2: 0,
+      3: 0,
+
+      4: 1,
+      5: 1,
+      6: 1,
+      7: 1,
+
+      8: 2,
+      9: 2,
+      10:2,
+      11:2,
+
+      12:3,
+      13:3,
+      14:3,
+      15:3
+      };
   }
 
   @override
@@ -28,10 +59,10 @@ class Grid {
     return "Grid";
   }
 
-  List<List<Map<int, int>>> generateLocationsMap() {
+  List<List<Map<dynamic, dynamic>>> generateLocationsMap() {
     // generate the locations for the entire grid
-    List<List<Map<int, int>>> segmentLocationsMap = [];
-    List<Map<int, int>> rowLocations;
+    List<List<Map<dynamic, dynamic>>> segmentLocationsMap = [];
+    List<Map<dynamic, dynamic>> rowLocations;
 
     for (int rowIdx = 0; rowIdx < grid.length; rowIdx++) {
       rowLocations = [];
@@ -52,17 +83,17 @@ class Grid {
 
   void displayGrid() {
     for (int rowIdx = 0; rowIdx < grid.length; rowIdx++) {
-      List<int> row = grid[rowIdx];
+      List<dynamic> row = grid[rowIdx];
       for (int colIdx = 0; colIdx < row.length; colIdx++) {
-        int value = row[colIdx];
+        String value = row[colIdx];
         stdout.write('$value ');
 
-        if (colIdx == 2 || colIdx == 5) {
+        if (colIdx == 3 || colIdx == 7 || colIdx == 11) {
           stdout.write('  ');
         }
       }
 
-      if (rowIdx == 2 || rowIdx == 5) {
+      if (rowIdx == 3 || rowIdx == 7 || rowIdx == 11 ) {
         stdout.write('\n\n');
       } else {
         stdout.write('\n');
@@ -70,11 +101,11 @@ class Grid {
     }
   }
 
-  List<int> getValuesInRow(int rowNumber) {
-    List<int> uVals = [];
-    List<int> row = grid[rowNumber];
+  List<dynamic> getValuesInRow(int rowNumber) {
+    List<dynamic> uVals = [];
+    List<dynamic> row = grid[rowNumber];
     for (int i = 0; i < row.length; i++) {
-      int value = row[i];
+      String value = row[i];
       if (!uVals.contains(value)) {
         uVals.add(value);
       }
@@ -82,10 +113,10 @@ class Grid {
     return uVals;
   }
 
-  List<int> getValuesInCol(int colNumber) {
-    List<int> uVals = [];
+  List<dynamic> getValuesInCol(int colNumber) {
+    List<dynamic> uVals = [];
     for (int i = 0; i < grid.length; i++) {
-      List<int> row = grid[i];
+      List<dynamic> row = grid[i];
       int value = row[colNumber];
       if (!uVals.contains(value)) {
         uVals.add(value);
@@ -94,20 +125,25 @@ class Grid {
     return uVals;
   }
 
-  List<int> getValuesInSegment(int locX, int locY) {
-    Map<int, int> startFromMap = {0: 0, 1: 3, 2: 6};
+  List<dynamic> getValuesInSegment(int locX, int locY) {
+    Map<dynamic, dynamic> startFromMap = {
+      0: 0,
+      1: 4,
+      2: 8,
+      3: 12,
+      };
     int rowsStartFrom = startFromMap[locY]!;
     int colsStartFrom = startFromMap[locX]!;
-    List<List<int>> rows = grid.sublist(rowsStartFrom, rowsStartFrom + 3);
+    List<List<dynamic>> rows = grid.sublist(rowsStartFrom, rowsStartFrom + 4);
 
     for (int i = 0; i < rows.length; i++) {
-      List<int> rowValues = rows[i].sublist(colsStartFrom, colsStartFrom + 3);
+      List<dynamic> rowValues = rows[i].sublist(colsStartFrom, colsStartFrom + 4);
       rows[i] = rowValues;
     }
 
-    List<int> uVals = [];
+    List<dynamic> uVals = [];
     for (int a = 0; a < rows.length; a++) {
-      List<int> row = rows[a];
+      List<dynamic> row = rows[a];
 
       for (int b = 0; b < row.length; b++) {
         int value = row[b];
@@ -120,43 +156,48 @@ class Grid {
     return uVals;
   }
 
-  List<Map<int, int>> getSegmentLocations(int locX, int locY) {
+  List<Map<dynamic, dynamic>> getSegmentLocations(int locX, int locY) {
     // reduce the locations to the desired segments
-    Map<int, int> startFromMap = {0: 0, 1: 3, 2: 6};
-    List<Map<int, int>> combined = [];
+    Map<dynamic, dynamic> startFromMap = {
+      0: 0,
+      1: 4,
+      2: 7,
+      3: 12,
+    };
+    List<Map<dynamic, dynamic>> combined = [];
 
     int rowsStartFrom = startFromMap[locY]!;
     int colsStartFrom = startFromMap[locX]!;
-    List<List<Map<int, int>>> rows =
-        locationsMap.sublist(rowsStartFrom, rowsStartFrom + 3);
+    List<List<Map<dynamic, dynamic>>> rows =
+        locationsMap.sublist(rowsStartFrom, rowsStartFrom + 4);
 
     for (int i = 0; i < rows.length; i++) {
-      List<Map<int, int>> rowValues =
-          rows[i].sublist(colsStartFrom, colsStartFrom + 3);
+      List<Map<dynamic, dynamic>> rowValues =
+          rows[i].sublist(colsStartFrom, colsStartFrom + 4);
       combined.addAll(rowValues);
     }
 
     return combined;
   }
 
-  List<int> getBlockSoloutionSpace(int locX, int locY) {
+  List<dynamic> getBlockSoloutionSpace(int locX, int locY) {
     int currentValue = grid[locY][locX];
-    if (currentValue != 0) {
-      List<int> cv = [currentValue];
+    if (currentValue != '0') {
+      List<dynamic> cv = [currentValue];
       return cv;
     }
 
-    List<int> soloutionSpace = [1, 2, 3, 4, 5, 6, 7, 8, 9];
+    List<dynamic> soloutionSpace = ['1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F', 'G'];
 
     // Getting values in segment, row, and column
     int segX = blockSegmentMap[locX]!;
     int segY = blockSegmentMap[locY]!;
-    List<int> segmentValues = getValuesInSegment(segX, segY);
-    List<int> rowValues = getValuesInRow(locY);
-    List<int> colValues = getValuesInCol(locX);
+    List<dynamic> segmentValues = getValuesInSegment(segX, segY);
+    List<dynamic> rowValues = getValuesInRow(locY);
+    List<dynamic> colValues = getValuesInCol(locX);
 
     // combine segment, row, and column into one list
-    List<int> conflictingValues = [];
+    List<dynamic> conflictingValues = [];
     conflictingValues.addAll(segmentValues);
     conflictingValues.addAll(rowValues);
     conflictingValues.addAll(colValues);
@@ -173,9 +214,9 @@ class Grid {
   }
 
   void singleOptionPass() {
-    for (int y = 0; y < 9; y++) {
-      for (int x = 0; x < 9; x++) {
-        List<int> solSpace = getBlockSoloutionSpace(x, y);
+    for (int y = 0; y < 16; y++) {
+      for (int x = 0; x < 16; x++) {
+        List<dynamic> solSpace = getBlockSoloutionSpace(x, y);
         if (solSpace.length == 1) {
           grid[y][x] = solSpace[0];
         }
@@ -184,11 +225,11 @@ class Grid {
   }
 
   void elemenationPass() {
-    for (int y = 0; y < 9; y++) {
-      for (int x = 0; x < 9; x++) {
-        List<int> blockSoloutionSpace = getBlockSoloutionSpace(x, y);
+    for (int y = 0; y < 16; y++) {
+      for (int x = 0; x < 16; x++) {
+        List<dynamic> blockSoloutionSpace = getBlockSoloutionSpace(x, y);
         if (blockSoloutionSpace.length > 1) {
-          List<Map<int, int>> neighbourBlocksLocations =
+          List<Map<dynamic, dynamic>> neighbourBlocksLocations =
               getSegmentLocations(blockSegmentMap[y]!, blockSegmentMap[x]!);
           neighbourBlocksLocations.remove({y: x});
 
@@ -196,14 +237,14 @@ class Grid {
           for (int i = 0; i < blockSoloutionSpace.length; i++) {
             if (grid[y][x] == 0) {
               // checking every possible soloution
-              int soloution = blockSoloutionSpace[i];
+              var soloution = blockSoloutionSpace[i];
 
               for (int neighbourBlock = 0;
                   neighbourBlock < neighbourBlocksLocations.length;
                   neighbourBlock++) {
                 int locY = neighbourBlocksLocations[i].keys.first;
                 int locX = neighbourBlocksLocations[i][locY]!;
-                List<int> nBlockSoloutions = getBlockSoloutionSpace(locX, locY);
+                List<dynamic> nBlockSoloutions = getBlockSoloutionSpace(locX, locY);
                 if (nBlockSoloutions.contains(soloution)) {
                   blockSoloutionSpace.remove(soloution);
                 }
@@ -227,9 +268,9 @@ class Grid {
   int countEmpty() {
     int zeroCount = 0;
 
-    for (int y = 0; y < 9; y++) {
-      for (int x = 0; x < 9; x++) {
-        if (grid[y][x] == 0) {
+    for (int y = 0; y < 16; y++) {
+      for (int x = 0; x < 16; x++) {
+        if (grid[y][x] == '0') {
           zeroCount++;
         }
       }
